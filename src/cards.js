@@ -27,13 +27,13 @@ const Cards = () => {
   const [cards, setCards] = useState([]);
   const [drawnCards, setDrawnCards] = useState([]);
   const [drawnCard, setDrawnCard] = useState();
-  const [currentCard, setCurrentCard] = useState();
   const [score, setScore] = useState(0);
   const [scoreText, setScoreText] = useState("");
-  const [guess, setGuess] = useState("");
+  const ref = useRef();
 
-  const prev = usePrevious(currentCard);
-  const drawn = usePrevious(drawnCard);
+  useEffect(() => {
+    ref.current = drawnCard;
+  }, [drawnCard]);
 
   const getCards = async () => {
     const res = await axios.get(
@@ -49,30 +49,22 @@ const Cards = () => {
     getCards();
   }, []);
 
-  const drawNewCard = () => {
+  const drawNewCard = (guess) => {
     const copy = [...cards];
     const updatedCards = copy?.shift();
     const processedCard = obj[updatedCards.value]
       ? obj[updatedCards.value]
       : updatedCards.value;
-    setCurrentCard(processedCard);
-    setCurrentCard((state) => {
-      console.log(state);
-      return state;
-    });
 
-    console.log("PREV: ", prev);
     setCards(copy);
     setDrawnCards([...drawnCards, updatedCards]);
     setDrawnCard(updatedCards);
-    compareHandler();
+    compareHandler(guess, processedCard);
   };
 
-  const compareHandler = () => {
-    let isLower = currentCard < prev;
+  const compareHandler = (guess, current) => {
+    let isLower = current < ref?.current?.value;
     let isGuessLower = guess === "low";
-    console.log("ISLOWER: ", isLower);
-    console.log("isGUESSLOWER: ", isGuessLower);
 
     if (
       (isLower && isGuessLower) ||
@@ -83,28 +75,23 @@ const Cards = () => {
     } else {
       setScoreText("Your guess was wrong, try again!");
     }
-
-    setGuess("");
   };
 
   return (
     <>
       <div>Is next card higher or lower?</div>
-      <p>{guess}</p>
-      {drawnCards && drawnCards.length ? (
+      {drawnCards && drawnCards?.length ? (
         <>
           <button
             onClick={() => {
-              setGuess("low");
-              drawNewCard();
+              drawNewCard("low");
             }}
           >
             Low
           </button>
           <button
             onClick={() => {
-              setGuess("high");
-              drawNewCard();
+              drawNewCard("high");
             }}
           >
             High
@@ -122,10 +109,10 @@ const Cards = () => {
       <p>{scoreText}</p>
       <p>Remaining cards in deck: {cards?.length}</p>
       <p>Your score: {score}</p>
-      {prev ? (
+      {ref.current ? (
         <>
           <p>Prev card</p>
-          <img width={100} height={150} src={drawn?.image} />
+          <img width={100} height={150} src={ref?.current?.image} />
         </>
       ) : (
         ""
@@ -148,14 +135,4 @@ export const Card = ({ image }) => {
       <CardContainer>{<img src={image} />}</CardContainer>
     </>
   );
-};
-
-export const usePrevious = (value) => {
-  console.log("VALUE: ", value);
-  const ref = useRef();
-  useEffect(() => {
-    ref.current = value;
-  }, [value]);
-
-  return ref.current;
 };
