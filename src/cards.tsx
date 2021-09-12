@@ -1,4 +1,5 @@
 import axios from "axios";
+import { stringify } from "querystring";
 import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 
@@ -16,7 +17,26 @@ const CardContainer = styled.div`
   margin: 10px;
 `;
 
-const obj = {
+interface IDrawnCard {
+  code: string;
+  image: string;
+  images: unknown;
+  suit: string;
+  value: string;
+}
+
+interface IObjectKeys {
+  [key: string]: string | number | undefined;
+}
+
+interface IObj extends IObjectKeys {
+  ACE?: number;
+  KING?: number;
+  QUEEN?: number;
+  JACK?: number;
+}
+
+const obj: IObj = {
   ACE: 14,
   KING: 13,
   QUEEN: 12,
@@ -24,12 +44,12 @@ const obj = {
 };
 
 const Cards = () => {
-  const [cards, setCards] = useState([]);
-  const [drawnCards, setDrawnCards] = useState([]);
-  const [drawnCard, setDrawnCard] = useState();
+  const [cards, setCards] = useState<IDrawnCard[]>([]);
+  const [drawnCards, setDrawnCards] = useState<IDrawnCard[] | any>([]);
+  const [drawnCard, setDrawnCard] = useState<IDrawnCard>();
   const [score, setScore] = useState(0);
   const [scoreText, setScoreText] = useState("");
-  const ref = useRef();
+  const ref = useRef<any>();
 
   useEffect(() => {
     ref.current = drawnCard;
@@ -49,12 +69,13 @@ const Cards = () => {
     getCards();
   }, []);
 
-  const drawNewCard = (guess) => {
+  const drawNewCard = (guess: string) => {
     const copy = [...cards];
-    const updatedCards = copy?.shift();
-    const processedCard = obj[updatedCards.value]
-      ? obj[updatedCards.value]
-      : updatedCards.value;
+    const updatedCards: undefined | IDrawnCard = copy?.shift();
+    const processedCard: number | undefined | string =
+      updatedCards && obj[updatedCards?.value]
+        ? obj[updatedCards?.value]
+        : updatedCards?.value;
 
     setCards(copy);
     setDrawnCards([...drawnCards, updatedCards]);
@@ -62,13 +83,16 @@ const Cards = () => {
     compareHandler(guess, processedCard);
   };
 
-  const compareHandler = (guess, current) => {
-    let isLower = current < ref?.current?.value;
+  const compareHandler = (
+    guess: string,
+    current: number | undefined | string
+  ) => {
+    let isLower = current ? current < ref?.current?.value : "";
     let isGuessLower = guess === "low";
 
     if (
       (isLower && isGuessLower) ||
-      (!isLower && !isGuessLower && drawnCards.length > 1)
+      (!isLower && !isGuessLower && drawnCards?.length > 1)
     ) {
       setScore((state) => state + 1);
       setScoreText("Nice one! One point for you!");
@@ -100,7 +124,7 @@ const Cards = () => {
       ) : (
         <button
           onClick={() => {
-            drawNewCard();
+            drawNewCard("");
           }}
         >
           Get cards
@@ -119,7 +143,7 @@ const Cards = () => {
       )}
       <CardWrapper>
         <p>Current card</p>
-        {drawnCards?.map((item, i) => (
+        {drawnCards?.map((item: IDrawnCard, i: number) => (
           <Card key={i} image={item?.image} />
         ))}
       </CardWrapper>
@@ -129,10 +153,10 @@ const Cards = () => {
 
 export default Cards;
 
-export const Card = ({ image }) => {
+export const Card: React.FunctionComponent<{ image: string }> = (props) => {
   return (
     <>
-      <CardContainer>{<img src={image} />}</CardContainer>
+      <CardContainer>{<img src={props.image} />}</CardContainer>
     </>
   );
 };
