@@ -49,6 +49,9 @@ const Cards = () => {
   const [drawnCard, setDrawnCard] = useState<IDrawnCard>();
   const [score, setScore] = useState(0);
   const [scoreText, setScoreText] = useState("");
+  const [prevCardValue, setPrevCardValue] = useState<
+    number | undefined | string
+  >();
   const ref = useRef<any>();
 
   useEffect(() => {
@@ -76,8 +79,9 @@ const Cards = () => {
       updatedCards && obj[updatedCards?.value]
         ? obj[updatedCards?.value]
         : updatedCards?.value;
-
+    console.log("PROCESSEDCARD : ", processedCard);
     setCards(copy);
+    setPrevCardValue(processedCard);
     setDrawnCards([...drawnCards, updatedCards]);
     setDrawnCard(updatedCards);
     compareHandler(guess, processedCard);
@@ -87,7 +91,7 @@ const Cards = () => {
     guess: string,
     current: number | undefined | string
   ) => {
-    let isLower = current ? current < ref?.current?.value : "";
+    let isLower = current ? current < (prevCardValue ? prevCardValue : "") : "";
     let isGuessLower = guess === "low";
 
     if (
