@@ -1,7 +1,7 @@
 import axios from "axios";
-import { stringify } from "querystring";
 import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
+import { Fade, Slide } from "react-awesome-reveal";
 
 const CardWrapper = styled.div`
   max-width: 800px;
@@ -79,7 +79,7 @@ const Cards = () => {
       updatedCards && obj[updatedCards?.value]
         ? obj[updatedCards?.value]
         : updatedCards?.value;
-    console.log("PROCESSEDCARD : ", processedCard);
+
     setCards(copy);
     setPrevCardValue(processedCard);
     setDrawnCards([...drawnCards, updatedCards]);
@@ -100,6 +100,8 @@ const Cards = () => {
     ) {
       setScore((state) => state + 1);
       setScoreText("Nice one! One point for you!");
+    } else if (drawnCards?.length < 1) {
+      setScoreText("");
     } else {
       setScoreText("Your guess was wrong, try again!");
     }
@@ -139,8 +141,10 @@ const Cards = () => {
       <p>Your score: {score}</p>
       {ref.current ? (
         <>
-          <p>Prev card</p>
-          <img width={100} height={150} src={ref?.current?.image} />
+          <Fade>
+            <p>Prev card</p>
+            <img width={100} height={150} src={ref?.current?.image} />
+          </Fade>
         </>
       ) : (
         ""
@@ -160,7 +164,9 @@ export default Cards;
 export const Card: React.FunctionComponent<{ image: string }> = (props) => {
   return (
     <>
-      <CardContainer>{<img src={props.image} />}</CardContainer>
+      <Fade>
+        <CardContainer>{<img src={props.image} />}</CardContainer>
+      </Fade>
     </>
   );
 };
