@@ -1,20 +1,12 @@
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import { Fade, Slide } from "react-awesome-reveal";
+import PrevCard from "./components/Cards/PrevCard";
+import CurrentCard from "./components/Cards/CurrentCard";
 
 const CardWrapper = styled.div`
   max-width: 800px;
   position: relative;
-`;
-
-const CardContainer = styled.div`
-  max-width: 350px;
-  border-radius: 8px;
-  position: absolute;
-  z-index: 1;
-  top: 16;
-  margin: 10px;
 `;
 
 interface IDrawnCard {
@@ -139,20 +131,12 @@ const Cards = () => {
       <p>{scoreText}</p>
       <p>Remaining cards in deck: {cards?.length}</p>
       <p>Your score: {score}</p>
-      {ref.current ? (
-        <>
-          <Fade>
-            <p>Prev card</p>
-            <img width={100} height={150} src={ref?.current?.image} />
-          </Fade>
-        </>
-      ) : (
-        ""
-      )}
+      <PrevCard prevCard={ref?.current?.image} />
+
       <CardWrapper>
         <p>Current card</p>
         {drawnCards?.map((item: IDrawnCard, i: number) => (
-          <Card key={i} image={item?.image} />
+          <CurrentCard key={i} image={item?.image} />
         ))}
       </CardWrapper>
     </>
@@ -160,13 +144,3 @@ const Cards = () => {
 };
 
 export default Cards;
-
-export const Card: React.FunctionComponent<{ image: string }> = (props) => {
-  return (
-    <>
-      <Fade>
-        <CardContainer>{<img src={props.image} />}</CardContainer>
-      </Fade>
-    </>
-  );
-};
