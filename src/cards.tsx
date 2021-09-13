@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import PrevCard from "./components/Cards/PrevCard";
 import CurrentCard from "./components/Cards/CurrentCard";
+import Button from "./components/Button/Button";
 
 const CardWrapper = styled.div`
   max-width: 800px;
@@ -104,29 +105,11 @@ const Cards = () => {
       <div>Is next card higher or lower?</div>
       {drawnCards && drawnCards?.length ? (
         <>
-          <button
-            onClick={() => {
-              drawNewCard("low");
-            }}
-          >
-            Low
-          </button>
-          <button
-            onClick={() => {
-              drawNewCard("high");
-            }}
-          >
-            High
-          </button>
+          <Button text={"low"} drawNewCard={drawNewCard} />
+          <Button text={"high"} drawNewCard={drawNewCard} />
         </>
       ) : (
-        <button
-          onClick={() => {
-            drawNewCard("");
-          }}
-        >
-          Get cards
-        </button>
+        <Button text={"Get cards"} drawNewCard={drawNewCard} />
       )}
       <p>{scoreText}</p>
       <p>Remaining cards in deck: {cards?.length}</p>
